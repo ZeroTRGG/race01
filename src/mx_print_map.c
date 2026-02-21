@@ -1,4 +1,4 @@
-#include "way_home.h"
+#include <way_home.h>
 
 void mx_print_map(char **map, int width, int height) {
     for (int i = 0; i < height; i++) {

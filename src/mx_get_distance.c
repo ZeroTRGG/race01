@@ -1,4 +1,4 @@
-#include "way_home.h"
+#include <way_home.h>
 
 int **get_distance_map(char **map, int width, int height, int x1, int y1) {
     int **dist = (int **)malloc(height * sizeof(int *));

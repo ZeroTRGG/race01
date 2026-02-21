@@ -1,4 +1,5 @@
 #include <way_home.h>
+
 int mx_strlen(const char *c) {
     int length = 0;
 

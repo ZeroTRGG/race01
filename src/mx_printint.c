@@ -11,6 +11,7 @@ void mx_printint(int n) {
         n_string[i] = n % 10 + 48;
         n /= 10;
     }
+    
     for (int i = 0; i < digit_count; i++) mx_printchar(n_string[i]);
 
 }

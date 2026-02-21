@@ -1,4 +1,4 @@
-#include "way_home.h"
+#include <way_home.h>
 
 void populate_map(const char *filename, char **map) {
     int fd = open(filename, O_RDONLY);

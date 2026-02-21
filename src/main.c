@@ -1,4 +1,4 @@
-#include "way_home.h"
+#include <way_home.h>
 
 int main(int argc, char *argv[]) {
     if (argc != 6) {
