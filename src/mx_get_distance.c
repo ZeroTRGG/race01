@@ -1,32 +1,44 @@
 #include <way_home.h>
 
-int **get_distance_map(char **map, int width, int height, int x1, int y1) {
-    int **dist = (int **)malloc(height * sizeof(int *));
-    for (int i = 0; i < height; i++) {
-        dist[i] = (int *)malloc(width * sizeof(int));
-        for (int j = 0; j < width; j++) dist[i][j] = -1;
+int **alloc_dist(int w, int h) {
+    int **dist = (int **)malloc(h * sizeof(int *));
+    
+    for (int i = 0; i < h; i++) {
+        dist[i] = (int *)malloc(w * sizeof(int));
+        for (int j = 0; j < w; j++) dist[i][j] = -1;
     }
+    return dist;
+}
 
-    if (map[y1][x1] == '#') return dist;
-    dist[y1][x1] = 0;
+void update_adj(char **map, int **dist, int *in, int *s) {
+    int dx[] = {0, 0, 1, -1};
+    int dy[] = {1, -1, 0, 0};
+    int nx, ny;
+    
+    for (int i = 0; i < 4; i++) {
+        nx = s[0] + dx[i];
+        ny = s[1] + dy[i];
+        if (nx >= 0 && nx < in[0] && ny >= 0 && ny < in[1]) {
+            if (map[ny][nx] == '.' && dist[ny][nx] == -1) {
+                dist[ny][nx] = s[2] + 1;
+                s[3] = 1;
+            }
+        }
+    }
+}
 
-    bool changed = true;
-    for (int d = 0; changed; d++) {
-        changed = false;
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                if (dist[y][x] == d) {
-                    int dx[] = {0, 0, 1, -1};
-                    int dy[] = {1, -1, 0, 0};
-                    for (int i = 0; i < 4; i++) {
-                        int nx = x + dx[i], ny = y + dy[i];
-                        if (nx >= 0 && nx < width && ny >= 0 && ny < height &&
-                            map[ny][nx] == '.' && dist[ny][nx] == -1) {
-                            dist[ny][nx] = d + 1;
-                            changed = true;
-                        }
-                    }
-                }
+int **get_distance_map(char **map, int *in) {
+    int **dist = alloc_dist(in[0], in[1]);
+    int s[4] = {0, 0, 0, 1};
+    
+    if (map[in[3]][in[2]] == '#') return dist;
+    dist[in[3]][in[2]] = 0;
+    for (s[2] = 0; s[3]; s[2]++) {
+        s[3] = 0;
+        for (s[1] = 0; s[1] < in[1]; s[1]++) {
+            for (s[0] = 0; s[0] < in[0]; s[0]++) {
+                if (dist[s[1]][s[0]] == s[2])
+                    update_adj(map, dist, in, s);
             }
         }
     }

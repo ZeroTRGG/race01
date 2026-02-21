@@ -1,52 +1,51 @@
 #include <way_home.h>
 
-bool is_valid_map_char(char c) {
+bool is_valid_char(char c) {
     return (c == '#' || c == '.' || c == ',' || c == '\n');
 }
 
-void get_map_dimensions(const char *filename, int *width, int *height) {
-    int fd = open(filename, O_RDONLY);
-    if (fd < 0) {
+void open_map(const char *filename, int *fd) {
+    *fd = open(filename, O_RDONLY);
+    if (*fd < 0) {
         mx_printerr("map does not exist\n");
         exit(1);
     }
+}
 
+void proc_char(char c, int *cw, int *fw, int *h) {
+    if (!is_valid_char(c)) {
+        mx_printerr("map error\n");
+        exit(1);
+    }
+    if (c == '#' || c == '.') (*cw)++;
+    if (c == '\n' && *cw > 0) {
+        if (*fw == -1) *fw = *cw;
+        else if (*cw != *fw) {
+            mx_printerr("map error\n");
+            exit(1);
+        }
+        (*h)++;
+        *cw = 0;
+    }
+}
+
+void get_map_dimensions(const char *file, int *w, int *h) {
+    int fd, br;
     char c;
-    int current_width = 0;
-    int first_row_width = -1;
-    *height = 0;
-    int bytes_read;
-
-    while ((bytes_read = read(fd, &c, 1)) > 0) {
-        if (!is_valid_map_char(c)) {
-            mx_printerr("map error\n");
-            exit(1);
-        }
-        if (c == '#' || c == '.') current_width++;
-        if (c == '\n') {
-            if (current_width > 0) {
-                if (first_row_width == -1) {
-                    first_row_width = current_width;
-                } 
-                else if (current_width != first_row_width) {
-                    mx_printerr("map error\n");
-                    exit(1);
-                }
-                (*height)++;
-                current_width = 0;
-            }
-        }
-    }
+    int v[2] = {0, -1};
     
-    if (current_width > 0) {
-        if (first_row_width != -1 && current_width != first_row_width) {
+    open_map(file, &fd);
+    *h = 0;
+    while ((br = read(fd, &c, 1)) > 0) proc_char(c, &v[0], &v[1], h);
+    if (v[0] > 0) {
+        if (v[1] != -1 && v[0] != v[1]) {
             mx_printerr("map error\n");
             exit(1);
         }
-        (*height)++;
+        (*h)++;
     }
-    *width = first_row_width;
-    if (*height == 0 || *width <= 0) {
+    *w = v[1];
+    if (*h == 0 || *w <= 0) {
         mx_printerr("map does not exist\n");
         exit(1);
     }

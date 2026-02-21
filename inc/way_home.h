@@ -22,7 +22,7 @@ int mx_strlen(const char *c);
 void get_map_dimensions(const char *filename, int *width, int *height);
 void mx_print_map(char **map, int width, int height);
 void populate_map(const char *filename, char **map);
-int **get_distance_map(char **map, int width, int height, int x1, int y1);
+int **get_distance_map(char **map, int *in);
 
 
 #endif
